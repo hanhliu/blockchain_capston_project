@@ -24,6 +24,8 @@ contract Liquidation {
 
     event HealthFactorCalculated(address borrower,uint256 totalCollateral,uint256 totalDebtOnUSDC, uint256 healthFactor);
 
+    event TempEvent(address user, uint256 path1, uint256 path2, uint256 path3, uint256 path_1, uint256 path_2);
+
     constructor() {
         owner = msg.sender;
     }
@@ -40,8 +42,8 @@ contract Liquidation {
         uint256 totalCollateral = (loan.usdcCollateral * collateralRatioUSDC) / 100;
 
         // Tính tổng nợ quy về USDC
-        uint256 ethDebtInUSDC = (loan.ethDebt * ethPriceOnUSDC) / 10; // Vì bạn nhập 0.2 ETH dưới dạng 2
-        uint256 axsDebtInUSDC = (loan.axsDebt * axsToETHPrice * ethPriceOnUSDC) / 10000;
+        uint256 ethDebtInUSDC = (loan.ethDebt * ethPriceOnUSDC) / 1000; // Vì bạn nhập 0.2 ETH dưới dạng 200
+        uint256 axsDebtInUSDC = (loan.axsDebt * axsToETHPrice * ethPriceOnUSDC) / 10000;  // Nhập axs dưới dạng 20
         uint256 totalDebt = ethDebtInUSDC + axsDebtInUSDC;
 
         if (totalDebt == 0) {
@@ -57,15 +59,60 @@ contract Liquidation {
         return healthFactor;
     }
 
-    function liquidate(address _borrower) public {
+    // Tính toán lượng tài sản cần thanh lý để đạt HF = 1
+    function calculateLiquidationAmount(address _borrower, string memory assetType) public view returns (uint256 usdcToLiquidate, uint256 assetToLiquidate) {
+        Loan memory loan = loans[_borrower];
+        uint256 totalCollateral = loan.usdcCollateral;
+        uint256 ethDebt = loan.ethDebt;
+        uint256 axsDebt = loan.axsDebt;
+
+        uint256 totalDebtUSDC = ethDebt * ethPriceOnUSDC + (axsDebt * axsToETHPrice * ethPriceOnUSDC) / 1e6;
+        
+        // Tính tổng nợ cần đạt được để HF = 1
+        uint256 targetDebtUSDC = (totalCollateral * collateralRatioUSDC) / 100;
+
+        if (totalDebtUSDC <= targetDebtUSDC) {
+            return (0, 0); // Không cần thanh lý
+        }
+
+        uint256 excessDebt = totalDebtUSDC - targetDebtUSDC;
+
+        if (keccak256(bytes(assetType)) == keccak256(bytes("ETH"))) {
+            assetToLiquidate = (excessDebt * 1e6) / ethPriceOnUSDC; // ETH là 1e6 để xử lý thập phân
+            usdcToLiquidate = (assetToLiquidate * ethPriceOnUSDC) / 1e6;
+        } else if (keccak256(bytes(assetType)) == keccak256(bytes("AXS"))) {
+            uint256 axsInETH = (excessDebt * 1e6) / (axsToETHPrice * ethPriceOnUSDC);
+            assetToLiquidate = axsInETH; // Tính theo số lượng AXS cần thanh lý
+            usdcToLiquidate = (assetToLiquidate * axsToETHPrice * ethPriceOnUSDC) / 1e6;
+        } else {
+            revert("Invalid asset type: Use 'ETH' or 'AXS'");
+        }
+    }
+
+    // Thực hiện thanh lý
+    function liquidate(address _borrower, string memory assetType, uint256 newUSDCPrice) public {
         require(getHealthFactor(_borrower) < 100, "Loan is still healthy");
 
         Loan storage loan = loans[_borrower];
+        uint256 ethToLiquidate;
+        uint256 usdcLost;
+        uint256 path_1;
+        uint256 path_2;
 
-        uint256 ethToLiquidate = loan.ethDebt / 2; // Giả sử liquidator thanh lý một phần ETH
-        uint256 usdcLost = ethToLiquidate * 1520;  // Tỷ giá USDC/ETH khi thanh lý
-
-        require(loan.usdcCollateral >= usdcLost, "Not enough collateral to liquidate");
+        if (keccak256(bytes(assetType)) == keccak256(bytes("ETH"))) {
+            path_1 = (loan.ethDebt * ethPriceOnUSDC) / 1000 + (loan.axsDebt * axsToETHPrice * ethPriceOnUSDC) / 10000 - (collateralRatioUSDC * loan.usdcCollateral) / 100;
+            path_2 = ethPriceOnUSDC - (collateralRatioUSDC * newUSDCPrice) / 100;
+            ethToLiquidate = (path_1 * 1000) / path_2;
+            usdcLost = (ethToLiquidate * newUSDCPrice) / 1000;
+            emit TempEvent(_borrower, (loan.ethDebt * ethPriceOnUSDC) / 100, (loan.axsDebt * axsToETHPrice * ethPriceOnUSDC) / 10000, 
+        (collateralRatioUSDC * loan.usdcCollateral) / 100, path_1, path_2);
+        } else if (keccak256(bytes(assetType)) == keccak256(bytes("ALL"))){
+            ethToLiquidate = (loan.ethDebt); // Giả sử liquidator thanh lý toàn bộ ETH
+            usdcLost = ethToLiquidate * newUSDCPrice / 1000;  // Tỷ giá USDC/ETH khi thanh lý
+        } else {
+            revert("Invalid asset type: Use 'ETH' or 'AXS'");
+        }
+        // require(loan.usdcCollateral >= usdcLost, "Not enough collateral to liquidate");
 
         loan.usdcCollateral -= usdcLost;
         loan.ethDebt -= ethToLiquidate;
@@ -78,6 +125,6 @@ contract Liquidation {
     }
 
     function changeAXSRate(uint256 _axsPrice) public {
-        axsToETHPrice = _axsPrice;
+        axsToETHPrice = _axsPrice; // Change rate theo kieu: 100
     }
 }   

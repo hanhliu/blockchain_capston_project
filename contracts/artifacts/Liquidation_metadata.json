@@ -16,6 +16,37 @@
 					{
 						"indexed": false,
 						"internalType": "address",
+						"name": "borrower",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "totalCollateral",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "totalDebtOnUSDC",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "healthFactor",
+						"type": "uint256"
+					}
+				],
+				"name": "HealthFactorCalculated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
 						"name": "user",
 						"type": "address"
 					},
@@ -33,6 +64,49 @@
 					}
 				],
 				"name": "Liquidated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "path1",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "path2",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "path3",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "path_1",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "path_2",
+						"type": "uint256"
+					}
+				],
+				"name": "TempEvent",
 				"type": "event"
 			},
 			{
@@ -65,7 +139,75 @@
 			},
 			{
 				"inputs": [],
-				"name": "axsPrice",
+				"name": "axsToETHPrice",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_borrower",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "assetType",
+						"type": "string"
+					}
+				],
+				"name": "calculateLiquidationAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "usdcToLiquidate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "assetToLiquidate",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_axsPrice",
+						"type": "uint256"
+					}
+				],
+				"name": "changeAXSRate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_ethPrice",
+						"type": "uint256"
+					}
+				],
+				"name": "changeETHRate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "collateralRatioAXS",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -78,7 +220,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "collateralFactorAXS",
+				"name": "collateralRatioETH",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -91,7 +233,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "collateralFactorETH",
+				"name": "collateralRatioUSDC",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -104,20 +246,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "collateralFactorUSDC",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "ethPrice",
+				"name": "ethPriceOnUSDC",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -144,7 +273,7 @@
 						"type": "uint256"
 					}
 				],
-				"stateMutability": "view",
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -153,6 +282,16 @@
 						"internalType": "address",
 						"name": "_borrower",
 						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "assetType",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "newUSDCPrice",
+						"type": "uint256"
 					}
 				],
 				"name": "liquidate",
@@ -216,7 +355,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/temp.sol": "Liquidation"
+			"contracts/learn.sol": "Liquidation"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -230,12 +369,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/temp.sol": {
-			"keccak256": "0x9826362bb3393dc5f9e328d7904650617d7b2cd9f5f07efe7762ae41926d6403",
+		"contracts/learn.sol": {
+			"keccak256": "0x8f456a111e67523cf2727a862b052e30a40a5b75e10211bd9c17caecbbf8941e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2834c6dc0ac98469421c484039e43a95d261aaa3bae6ae174d53451747a77b59",
-				"dweb:/ipfs/Qmcjd7cRhN27f6n6tGn7FXc2N6YRXc62b6wN3qXZPnboEw"
+				"bzz-raw://bab9a33bc7acb49322a14b61bcd9e6d39e7f3aa27776e23432d456c78e0fabfb",
+				"dweb:/ipfs/QmfPEhM4Uv16Cyb2rT5RjqfjmjGa22ZqKwbSXnGvz1rHww"
 			]
 		}
 	},
