@@ -1,0 +1,64 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/liquidation_temp.sol": "LiquidationCheck"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/liquidation_temp.sol": {
+			"keccak256": "0xd02db4346a9d618b7cf3d648e9e6c4042c89c8363cb8a3d51ccb182cd91bc363",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://e9b560d3b7d81cf0bf03bcef8e67400732e989efefbbf36ec0d163d2ad555674",
+				"dweb:/ipfs/QmeHw4ZA9mAvSvdcEiuCS98Exis4ffQrrm38XNWPTqpxQZ"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,72 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "get",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "x",
+						"type": "uint256"
+					}
+				],
+				"name": "set",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/first_smart_contract.sol": "SimpleStorage"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/first_smart_contract.sol": {
+			"keccak256": "0xef50916fa1bcbc88ba8034579a2bf0b728a8ecd189e807dc77d3992e08ef098b",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://dedcb2cdbf6eebe54313a9e466c19f77d943708d7322c5b5ef983e9f19ab85b0",
+				"dweb:/ipfs/QmbeR8n9B5H4S4uzeKnyEzB8ocx6XDviXRArKWrrZEkpGh"
+			]
+		}
+	},
+	"version": 1
+}
